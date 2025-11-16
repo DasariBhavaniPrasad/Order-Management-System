@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h1 {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-align: center;
+      margin-bottom: 36px;
+      color: #fff;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 36px;
+    }
+    .product-card {
+      background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+      border-radius: 22px;
+      box-shadow: 0 12px 40px 0 #667eea44, 0 2px 8px #fff3;
+      padding: 32px 24px 28px 24px;
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      transition: transform 0.22s, box-shadow 0.22s, background 0.22s;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #667eea22;
+    }
+    .product-card:hover {
+      transform: translateY(-10px) scale(1.04);
+      box-shadow: 0 24px 60px 0 #764ba2cc, 0 4px 16px #fff6;
+      background: linear-gradient(135deg, #e0e7ff 60%, #f8fafc 100%);
+      border-color: #764ba2cc;
+    }
+    .product-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: contain;
+      border-radius: 16px;
+      margin-bottom: 22px;
+      background: #fff;
+      box-shadow: 0 2px 12px #667eea22;
+      border: 2px solid #ffb34744;
+      transition: box-shadow 0.2s, border 0.2s;
+    }
+    .product-card:hover img {
+      box-shadow: 0 8px 24px #764ba2cc;
+      border-color: #ffb347cc;
+    }
+    .product-name {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #764ba2;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 8px #ffb34722;
+      background: linear-gradient(90deg,#667eea 30%,#ffb347 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .product-code {
+      font-size: 1.05rem;
+      color: #fff;
+      font-weight: 700;
+      margin-bottom: 6px;
+      background: linear-gradient(90deg,#667eea 60%,#ffb347 100%);
+      padding: 3px 14px;
+      border-radius: 8px;
+      display: inline-block;
+      box-shadow: 0 2px 8px #667eea22;
+      letter-spacing: 1px;
+    }
+    .product-category {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding: 3px 16px;
+      border-radius: 10px;
+      color: #fff;
+      background: linear-gradient(90deg, #ffb347 60%, #667eea 100%);
+      display: inline-block;
+      box-shadow: 0 2px 8px #ffb34722;
+      letter-spacing: 1px;
+    }
+    .product-price {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #22c55e;
+      margin-bottom: 12px;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 8px #22c55e22;
+    }
+    .product-id {
+      font-size: 0.95rem;
+      color: #888;
+      margin-top: 12px;
+      word-break: break-all;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; }
+      .container { padding: 0 8px; }
+      .product-card { padding: 18px 10px; }
+      .product-card img { height: 120px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>LIKHITHA BHAVANI TECHNEST</h1>
+    <div class="products-grid" id="productsGrid">
+      <!-- Product cards will be injected here -->
+    </div>
+    <div id="productModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:1000;justify-content:center;align-items:center;">
+      <div id="modalContent" style="background:rgba(255,255,255,0.97);border-radius:18px;box-shadow:0 8px 32px rgba(31,38,135,0.18);padding:36px 32px;max-width:400px;width:90vw;position:relative;text-align:center;">
+        <button id="closeModal" style="position:absolute;top:18px;right:18px;background:#667eea;color:#fff;border:none;border-radius:50%;width:32px;height:32px;font-size:1.3rem;cursor:pointer;">&times;</button>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    async function fetchProducts() {
+      const grid = document.getElementById('productsGrid');
+      grid.innerHTML = '<p style="color:#fff;text-align:center;">Loading products...</p>';
+      try {
+        const response = await fetch('https://dev-product-sapi-wtguo4.5sc6y6-2.usa-e2.cloudhub.io/api/products');
+        const products = await response.json();
+        grid.innerHTML = '';
+
+        // Sort products by name before rendering
+        products.sort((a, b) => a['Product Name'].localeCompare(b['Product Name']));
+        products.forEach(product => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.style.cursor = 'pointer';
+          card.innerHTML = `
+            <img src="${product['Product Image']}" alt="${product['Product Name']}" style="width:100%;height:180px;object-fit:contain;border-radius:12px;margin-bottom:18px;background:#fff;box-shadow:0 2px 8px #667eea22;" />
+            <div class="product-name" style="color:#222;text-shadow:0 2px 8px #fff8,0 1px 0 #667eea33;">${product['Product Name']}</div>
+            <div class="product-category" style="color:#fff;background:linear-gradient(90deg, #ffb347 60%, #667eea 100%);margin-bottom:8px;">${product['Product Category']}</div>
+            <div class="product-code" style="color:#fff;background:linear-gradient(90deg,#667eea 60%,#ffb347 100%);margin-bottom:8px;">Code: ${product['Product Code']}</div>
+            <div class="product-price" style="color:#22c55e;text-shadow:0 2px 8px #22c55e22;">Price: ₹${Number(product['Product Price']).toLocaleString()}</div>
+          `;
+          card.onclick = () => {
+            window.location.href = `ProductDetails.html?code=${product['Product Code']}`;
+          };
+          grid.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Failed to load products:', err);
+        grid.innerHTML = '<p style="color:#ff4d4d;text-align:center;">Failed to load products.</p>';
+      }
+    }
+
+    async function showProductModal(productCode) {
+      const modal = document.getElementById('productModal');
+      const modalBody = document.getElementById('modalBody');
+      modal.style.display = 'flex';
+      modalBody.innerHTML = '<p style="color:#667eea;font-weight:600;">Loading product details...</p>';
+      try {
+        const response = await fetch(`https://dev-product-sapi-wtguo4.5sc6y6-2.usa-e2.cloudhub.io/api/products/${productCode}`);
+        const product = await response.json();
+        modalBody.innerHTML = `
+          <img src="${product['Product Image']}" alt="${product['Product Name']}" style="width:100%;height:180px;object-fit:contain;border-radius:12px;margin-bottom:18px;background:#fff;box-shadow:0 2px 8px #667eea22;" />
+          <div style="font-size:1.5rem;font-weight:700;color:#3b3663;margin-bottom:8px;">${product['Product Name']}</div>
+          <div style="font-size:1.1rem;color:#667eea;font-weight:600;margin-bottom:6px;">${product['Product Code']}</div>
+          <div style="font-size:1rem;font-weight:600;margin-bottom:10px;color:#fff;background:linear-gradient(90deg,#667eea 60%,#764ba2 100%);padding:2px 12px;border-radius:8px;display:inline-block;">${product['Product Category']}</div>
+          <div style="font-size:1.2rem;font-weight:700;color:#22c55e;margin-bottom:10px;">₹${Number(product['Product Price']).toLocaleString()}</div>
+          <div style="font-size:0.95rem;color:#888;margin-top:10px;word-break:break-all;">ID: ${product['Product ID']}</div>
+        `;
+      } catch (err) {
+        modalBody.innerHTML = '<p style="color:#ff4d4d;">Failed to load product details.</p>';
+      }
+    }
+    document.getElementById('closeModal').onclick = function() {
+      document.getElementById('productModal').style.display = 'none';
+    }
+    fetchProducts();
+  </script>
+</body>
+</html>

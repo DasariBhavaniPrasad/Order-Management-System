@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Confirmation</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .confirmation-container {
+      background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+      border-radius: 22px;
+      box-shadow: 0 12px 40px 0 #667eea44, 0 2px 8px #fff3;
+      padding: 38px 32px;
+      color: #222;
+      max-width: 440px;
+      width: 95vw;
+      text-align: center;
+      border: 2px solid #667eea22;
+    }
+    h2 {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+      background: linear-gradient(90deg,#22c55e 30%,#667eea 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 4px 16px #667eea44,0 2px 8px #fff3;
+    }
+    .details {
+      font-size: 1.08rem;
+      color: #2563eb;
+      background: #e0e7ff;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 2px 8px #667eea22;
+      word-break: break-word;
+      margin-bottom: 18px;
+    }
+    .back-btn {
+      margin-top: 18px;
+      padding: 10px 24px;
+      background: linear-gradient(90deg,#667eea 60%,#ffb347 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.08rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 2px 8px #667eea22;
+    }
+    .back-btn:hover {
+      background: linear-gradient(90deg,#ffb347 60%,#667eea 100%);
+    }
+  </style>
+</head>
+<body>
+  <div class="confirmation-container">
+    <h2>Order Confirmed!</h2>
+    <div class="details" id="orderDetails">Loading order details...</div>
+    <button class="back-btn" onclick="window.location.href='Products.html'">Back to Products</button>
+  </div>
+  <script>
+    function getOrderParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        orderID: params.get('orderID'),
+        customerName: params.get('customerName'),
+        customerEmail: params.get('customerEmail'),
+        productCode: params.get('productCode'),
+        quantity: params.get('quantity'),
+        totalAmount: params.get('totalAmount'),
+        inventoryStatus: params.get('inventoryStatus'),
+        paymentStatus: params.get('paymentStatus'),
+        billingRef: params.get('billingRef')
+      };
+    }
+    function showOrderDetails() {
+      const details = getOrderParams();
+      const detailsDiv = document.getElementById('orderDetails');
+      detailsDiv.innerHTML = `
+        <strong>Order ID:</strong> ${details.orderID}<br>
+        <strong>Name:</strong> ${details.customerName}<br>
+        <strong>Email:</strong> ${details.customerEmail}<br>
+        <strong>Product Code:</strong> ${details.productCode}<br>
+        <strong>Quantity:</strong> ${details.quantity}<br>
+        <strong>Total Amount:</strong> ₹${details.totalAmount}<br>
+        <strong>Inventory Status:</strong> ${details.inventoryStatus}<br>
+        <strong>Payment Status:</strong> ${details.paymentStatus}<br>
+        <strong>Billing Ref:</strong> ${details.billingRef}
+      `;
+    }
+    showOrderDetails();
+  </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Product</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .order-container {
+      background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+      border-radius: 22px;
+      box-shadow: 0 12px 40px 0 #667eea44, 0 2px 8px #fff3;
+      padding: 38px 32px;
+      color: #222;
+      max-width: 440px;
+      width: 95vw;
+      text-align: center;
+      border: 2px solid #667eea22;
+    }
+    h2 {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+      background: linear-gradient(90deg,#22c55e 30%,#667eea 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 4px 16px #667eea44,0 2px 8px #fff3;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    input, select, textarea {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1.5px solid #667eea44;
+      font-size: 1rem;
+      background: #f8fafc;
+      color: #222;
+      margin-bottom: 2px;
+      resize: none;
+    }
+    button {
+      padding: 12px 28px;
+      background: linear-gradient(90deg,#667eea 60%,#ffb347 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.08rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 2px 8px #667eea22;
+    }
+    button:hover {
+      background: linear-gradient(90deg,#ffb347 60%,#667eea 100%);
+    }
+    .result {
+      margin-top: 18px;
+      font-size: 1.08rem;
+      color: #2563eb;
+      background: #e0e7ff;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 2px 8px #667eea22;
+      word-break: break-word;
+    }
+    .error {
+      color: #ef4444;
+      background: #fff0f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="order-container">
+    <h2>Order Product</h2>
+    <form id="orderForm">
+      <input type="text" id="customerName" placeholder="Customer Name" required />
+      <input type="email" id="customerEmail" placeholder="Customer Email" required />
+      <input type="number" id="quantity" placeholder="Quantity" min="1" required />
+      <select id="paymentMethod" required>
+        <option value="">Select Payment Method</option>
+        <option value="Card">Card</option>
+        <option value="UPI">UPI</option>
+        <option value="NetBanking">NetBanking</option>
+        <option value="COD">Cash on Delivery</option>
+      </select>
+      <textarea id="billingAddress" placeholder="Billing Address" rows="3" required></textarea>
+      <input type="hidden" id="productCode" />
+      <button type="submit">Place Order</button>
+    </form>
+    <div id="result" class="result"></div>
+  </div>
+  <script>
+    function getProductCodeFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('code');
+    }
+    document.getElementById('productCode').value = getProductCodeFromUrl() || '';
+    document.getElementById('orderForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const customerName = document.getElementById('customerName').value.trim();
+      const customerEmail = document.getElementById('customerEmail').value.trim();
+      const productCode = document.getElementById('productCode').value.trim();
+      const quantity = Number(document.getElementById('quantity').value);
+      const paymentMethod = document.getElementById('paymentMethod').value;
+      const billingAddress = document.getElementById('billingAddress').value.trim();
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = 'Placing order...';
+      resultDiv.className = 'result';
+      try {
+        const payload = {
+          customerName,
+          customerEmail,
+          productCode,
+          quantity,
+          paymentMethod,
+          billingAddress
+        };
+        console.log('Order payload:', payload);
+        const response = await fetch('https://order-management-experience-api-wtguo4.5sc6y6-1.usa-e2.cloudhub.io/api/submitOrder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        console.log('Order API response status:', response.status);
+        if (!response.ok) throw new Error('Order failed!');
+        const data = await response.json();
+        console.log('Order response data:', data);
+        // Redirect to confirmation page with order details
+        const params = new URLSearchParams({
+          orderID: data.orderID,
+          customerName: data.customerName,
+          customerEmail: data.customerEmail,
+          productCode: data.productCode,
+          quantity: data.quantity,
+          totalAmount: data.totalAmount,
+          inventoryStatus: data.inventoryStatus,
+          paymentStatus: data.paymentStatus,
+          billingRef: data.billingRef
+        });
+        window.location.href = `OrderConfirmation.html?${params.toString()}`;
+      } catch (err) {
+        console.error('Order error:', err);
+        resultDiv.textContent = 'Order failed! Please try again.';
+        resultDiv.className = 'result error';
+      }
+    });
+  </script>
+</body>
+</html>
