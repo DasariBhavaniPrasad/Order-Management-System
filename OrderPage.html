@@ -137,18 +137,18 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        const data = await response.json();
         console.log('Order API response status:', response.status);
         if(!response.ok) {
           let errorMessage = 'Order failed! Please try again.';
           try{
-            const errorData = await response.json();
-            if(errorData && errorData.message) {
-              errorMessage = errorData.message;
+            if(data && data.message) {
+              errorMessage = data.message;
             }
           } catch {}
           throw new Error(errorMessage);
         }
-        const data = await response.json();
+        
         console.log('Order response data:', data);
         // Redirect to confirmation page with order details
         const params = new URLSearchParams({
