@@ -137,7 +137,17 @@
           body: JSON.stringify(payload)
         });
         console.log('Order API response status:', response.status);
-        if (!response.ok) throw new Error('Order failed!');
+        if (!response.ok) {
+          // Try to extract error message from response
+          let errorMsg = 'Order failed! Please try again.';
+          try {
+            const errorData = await response.json();
+            if (errorData && errorData.message) {
+              errorMsg = errorData.message;
+            }
+          } catch {}
+          throw new Error(errorMsg);
+        }
         const data = await response.json();
         console.log('Order response data:', data);
         // Redirect to confirmation page with order details
@@ -155,10 +165,4 @@
         window.location.href = `OrderConfirmation.html?${params.toString()}`;
       } catch (err) {
         console.error('Order error:', err);
-        resultDiv.textContent = 'Order failed! Please try again.';
-        resultDiv.className = 'result error';
-      }
-    });
-  </script>
-</body>
-</html>
+        resultDiv.textContent = err.message || 'Order failed! Please try
