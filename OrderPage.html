@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -137,16 +138,15 @@
           body: JSON.stringify(payload)
         });
         console.log('Order API response status:', response.status);
-        if (!response.ok) {
-          // Try to extract error message from response
-          let errorMsg = 'Order failed! Please try again.';
-          try {
+        if(!response.ok) {
+          let errorMessage = 'Order failed! Please try again.';
+          try{
             const errorData = await response.json();
-            if (errorData && errorData.message) {
-              errorMsg = errorData.message;
+            if(errorData && errorData.message) {
+              errorMessage = errorData.message;
             }
           } catch {}
-          throw new Error(errorMsg);
+          throw new Error(errorMessage);
         }
         const data = await response.json();
         console.log('Order response data:', data);
@@ -165,4 +165,10 @@
         window.location.href = `OrderConfirmation.html?${params.toString()}`;
       } catch (err) {
         console.error('Order error:', err);
-        resultDiv.textContent = err.message || 'Order failed! Please try
+        resultDiv.textContent = err.message || 'Order failed! Please try again.';
+        resultDiv.className = 'result error';
+      }
+    });
+  </script>
+</body>
+</html>
