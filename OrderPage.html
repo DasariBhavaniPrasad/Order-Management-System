@@ -152,15 +152,15 @@
         console.log('Order response data:', data);
         // Redirect to confirmation page with order details
         const params = new URLSearchParams({
-          orderID: data.orderID,
-          customerName: data.customerName,
-          customerEmail: data.customerEmail,
-          productCode: data.productCode,
-          quantity: data.quantity,
-          totalAmount: data.totalAmount,
-          inventoryStatus: data.inventoryStatus,
-          paymentStatus: data.paymentStatus,
-          billingRef: data.billingRef
+          orderID: data.processAPIResponse.orderID,
+          customerName: data.processAPIResponse.customerName,
+          customerEmail: data.processAPIResponse.customerEmail,
+          productCode: data.processAPIResponse.productCode,
+          quantity: data.processAPIResponse.quantity,
+          totalAmount: data.processAPIResponse.totalAmount,
+          inventoryStatus: data.processAPIResponse.inventoryStatus,
+          paymentStatus: data.processAPIResponse.paymentStatus,
+          billingRef: data.processAPIResponse.billingRef
         });
         window.location.href = `OrderConfirmation.html?${params.toString()}`;
       } catch (err) {
